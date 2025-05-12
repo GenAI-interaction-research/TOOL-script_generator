@@ -1,0 +1,259 @@
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+    line-height: 1.6;
+    margin: 0;
+    padding: 20px;
+    background-color: #f8f9fa; /* Lighter background */
+    color: #212529; /* Darker text for better contrast */
+}
+
+header, footer {
+    text-align: center;
+    margin-bottom: 25px;
+    padding: 15px;
+    background-color: #343a40; /* Darker header/footer */
+    color: #fff;
+    border-radius: 5px;
+}
+
+header h1 { margin-top: 0; font-size: 1.8em;}
+footer p { margin-bottom: 0; font-size: 0.9em;}
+
+main {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 30px;
+}
+
+#config-panel {
+    flex: 1;
+    min-width: 320px;
+    background: #fff;
+    padding: 25px;
+    border-radius: 8px;
+    box-shadow: 0 2px 15px rgba(0,0,0,0.08);
+    border: 1px solid #dee2e6;
+}
+
+#output-panel {
+    flex: 2;
+    min-width: 400px;
+}
+
+#config-panel div {
+    margin-bottom: 18px;
+}
+
+#config-panel label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 600; /* Slightly bolder labels */
+    color: #495057;
+}
+
+#config-panel input[type="text"],
+#config-panel input[type="range"],
+#config-panel select,
+#config-panel textarea {
+    width: 100%; /* Use full width */
+    padding: 10px; /* Comfortable padding */
+    border: 1px solid #ced4da; /* Standard border */
+    border-radius: 4px;
+    box-sizing: border-box;
+    font-size: 0.95em;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+#config-panel input[type="text"]:focus,
+#config-panel select:focus,
+#config-panel textarea:focus {
+    border-color: #80bdff;
+    outline: 0;
+    box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);
+}
+
+#config-panel input[type="text"][disabled] {
+    background-color: #e9ecef;
+    opacity: 1; /* Ensure text is readable */
+    cursor: not-allowed;
+}
+
+#config-panel textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+
+#config-panel small.help-block {
+    display: block;
+    margin-top: 5px;
+    font-size: 0.85em;
+    color: #6c757d;
+}
+
+#show-cors-help {
+    font-size: 1em; /* Match surrounding text better */
+    color: #007bff;
+    text-decoration: none;
+    cursor: pointer;
+}
+#show-cors-help:hover {
+    text-decoration: underline;
+}
+
+.help-text-content { /* Style for the CORS help box */
+    margin-top: 10px;
+    padding: 15px;
+    background-color: #eef3f7; /* Lighter blueish grey */
+    border: 1px solid #c6d9e6; /* Softer blue border */
+    border-radius: 4px;
+    font-size: 0.9em;
+    line-height: 1.5;
+}
+.help-text-content p, .help-text-content ol {
+    margin-bottom: 0.75em;
+}
+.help-text-content li {
+    margin-bottom: 0.5em;
+}
+.help-text-content code {
+    background-color: #dde8f0; /* Code background matching help box */
+    padding: 2px 5px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
+    font-size: 0.95em;
+}
+.help-hide-button { /* Style for the "Got it, hide help" button */
+    margin-top: 10px;
+    font-size: 0.9em;
+    padding: 6px 12px;
+    background-color: #6c757d;
+    color: white;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: background-color 0.15s ease-in-out;
+}
+.help-hide-button:hover {
+    background-color: #5a6268;
+}
+
+
+#generate-btn {
+    display: inline-block;
+    background-color: #28a745; /* Green for generate */
+    color: white;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1.05em;
+    font-weight: 600;
+    margin-top: 10px;
+    transition: background-color 0.15s ease-in-out;
+}
+#generate-btn:hover {
+    background-color: #218838;
+}
+
+.output-group {
+    background: #fff;
+    padding: 20px;
+    margin-bottom: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 15px rgba(0,0,0,0.08);
+    border: 1px solid #dee2e6;
+}
+
+.output-group h3 {
+    margin-top: 0;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+    font-size: 1.2em;
+    color: #343a40;
+}
+
+pre {
+    background-color: #212529; /* Darker background for code */
+    color: #f8f9fa; /* Light text for code */
+    padding: 15px;
+    border-radius: 4px;
+    overflow-x: auto;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    font-size: 0.9em;
+    border: 1px solid #495057;
+}
+code {
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
+}
+
+.copy-btn {
+    background-color: #007bff; /* Blue for copy */
+    color: white;
+    margin-top: 10px; /* More space above copy button */
+    font-size: 0.9em;
+    padding: 8px 12px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.15s ease-in-out;
+}
+.copy-btn:hover {
+    background-color: #0069d9;
+}
+.copy-btn:disabled {
+    background-color: #6c757d;
+    cursor: not-allowed;
+}
+
+hr {
+    border: 0;
+    height: 1px;
+    background-color: #dee2e6;
+    margin-top: 25px;
+    margin-bottom: 25px;
+}
+
+.tab-bar {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+    gap: 10px;
+}
+.tab-btn {
+    background: #e9ecef;
+    border: none;
+    padding: 10px 24px;
+    font-size: 1em;
+    border-radius: 4px 4px 0 0;
+    cursor: pointer;
+    font-weight: 600;
+    color: #343a40;
+    transition: background 0.15s;
+}
+.tab-btn.active {
+    background: #fff;
+    border-bottom: 2px solid #007bff;
+    color: #007bff;
+}
+
+/* Makes help links not jump */
+.help-link, [id^="show-"][id$="-help"] {
+    cursor: pointer;
+}
+
+/* Style buttons to look like links */
+.help-link-button {
+    background: none;
+    border: none;
+    font-size: 1em;
+    color: #007bff;
+    text-decoration: none;
+    margin-left: 6px;
+    padding: 0;
+    cursor: pointer;
+    font-family: inherit;
+}
+.help-link-button:hover {
+    text-decoration: underline;
+    color: #0056b3;
+}

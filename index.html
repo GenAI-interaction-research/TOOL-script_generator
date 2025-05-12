@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GenAI Web App Configurator</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* Style buttons to look like links */
+        .help-link-button {
+            background: none;
+            border: none;
+            font-size: 1em; /* Ensure it matches label font size if needed */
+            color: #007bff;
+            text-decoration: none;
+            margin-left: 6px;
+            padding: 0;
+            cursor: pointer;
+            font-family: inherit; /* Inherit font from parent */
+            vertical-align: baseline; /* Align with text */
+        }
+        .help-link-button:hover {
+            text-decoration: underline;
+            color: #0056b3;
+        }
+        .tab-bar {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+            gap: 10px;
+        }
+        .tab-btn {
+            background: #e9ecef;
+            border: none;
+            padding: 10px 24px;
+            font-size: 1em;
+            border-radius: 4px 4px 0 0;
+            cursor: pointer;
+            font-weight: 600;
+            color: #343a40;
+            transition: background 0.15s;
+        }
+        .tab-btn.active {
+            background: #fff;
+            border-bottom: 2px solid #007bff;
+            color: #007bff;
+        }
+        /* Ensure main can handle flex if configurator-content is flex */
+        main {
+            /* display: flex; */ /* Remove this if you only want one panel visible at a time */
+            /* flex-direction: column; */ /* if using flex on main */
+        }
+        /* This wrapper will be set to display:flex by JS when active */
+        #configurator-content {
+             display: flex; /* Initial state to match script - or set by script */
+             flex-wrap: wrap; /* Allow panels to wrap if needed */
+             gap: 30px; /* Match original gap between config and output panels */
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>GenAI Web App Configurator</h1>
+        <p>Configure your Text-Based GenAI backend and frontend for research.</p>
+    </header>
+
+    <nav class="tab-bar">
+        <button id="tab-configurator" class="tab-btn active">Configurator</button>
+        <button id="tab-instructions" class="tab-btn">Instructions</button>
+    </nav>
+
+    <main>
+        <!-- Wrapper for Configurator and Output panels -->
+        <div id="configurator-content">
+            <section id="config-panel">
+                <h2>Configuration Options</h2>
+                <form id="config-form">
+                    <div id="text-options">
+                        <div>
+                            <label for="system-prompt">
+                                System Prompt:
+                                <button type="button" id="show-prompt-help" class="help-link-button">What is this?</button>
+                            </label><br>
+                            <textarea id="system-prompt" name="system-prompt" rows="4" placeholder="e.g., You are a helpful research assistant."></textarea>
+                            <div id="prompt-help-text" class="help-text-content" style="display:none;">
+                                <p>
+                                    <strong>What is a System Prompt?</strong><br>
+                                    The system prompt sets the AI's persona, behavior, and constraints. It's the foundation for how the AI will respond to all user inputs.
+                                    <br><br>
+                                    <strong>Tips for effective system prompts:</strong>
+                                    <ul>
+                                        <li><strong>Be specific:</strong> Clearly define the AI's role, knowledge boundaries, and response style.</li>
+                                        <li><strong>Include constraints:</strong> Specify what the AI should not do or avoid.</li>
+                                        <li><strong>Set tone and format:</strong> Indicate whether responses should be formal/informal, brief/detailed, etc.</li>
+                                    </ul>
+                                    <strong>Example for research:</strong>
+                                    <div style="background:#f8f9fa; padding:10px; border-radius:4px; margin:8px 0;">
+                                        You are a financial advisor helping participants understand investment risks. Explain concepts clearly using simple language. Always mention that your advice is for educational purposes only and not actual financial advice. Keep responses under 150 words.
+                                    </div>
+                                    <strong>Pro tip:</strong> You can ask ChatGPT, Claude, or any LLM to help create a system prompt for your specific research needs by describing your study's goals and constraints.
+                                    <button type="button" id="hide-prompt-help" class="help-hide-button">Got it, hide help</button>
+                                </p>
+                            </div>
+                        </div>
+                        <div>
+                            <label for="temperature">
+                                Temperature:
+                                <button type="button" id="show-temperature-help" class="help-link-button">What is this?</button>
+                            </label>
+                            <input type="range" id="temperature" name="temperature" min="0" max="1" step="0.1" value="0.7">
+                            <span id="temperature-value">0.7</span>
+                            <div id="temperature-help-text" class="help-text-content" style="display:none;">
+                                <p>
+                                    <strong>What is Temperature?</strong><br>
+                                    Temperature controls the randomness of the AI's responses:
+                                    <ul>
+                                        <li><strong>Lower values (0.0-0.3):</strong> More focused, deterministic, and predictable responses.</li>
+                                        <li><strong>Medium values (0.4-0.7):</strong> Balance between creativity and consistency.</li>
+                                        <li><strong>Higher values (0.8-1.0):</strong> More creative, varied, and sometimes unpredictable responses.</li>
+                                    </ul>
+                                    <strong>For research:</strong> Consider lower temperature for factual or consistent responses, higher for creative exploration.
+                                    <button type="button" id="hide-temperature-help" class="help-hide-button">Got it, hide help</button>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="option-group">
+                        <label for="max-output-tokens">Max Output Tokens:</label>
+                        <input type="number" id="max-output-tokens" name="max-output-tokens" value="500" min="1" step="1" style="width: 80px; padding: 5px;">
+                        <button type="button" id="show-tokens-help" class="help-btn-inline">?</button>
+                        <div id="tokens-help-text" class="help-text" style="display: none;">
+                            <p>Sets the maximum number of tokens (roughly words or parts of words) the AI can generate in its response. Lower values can prevent overly long answers, higher values allow for more detail. Default is often around 500-1000.</p>
+                            <button type="button" id="hide-tokens-help" class="help-btn-inline">Close</button>
+                        </div>
+                    </div>
+
+                    <hr>
+                    <h3>Backend Endpoint Configuration</h3>
+                    <div>
+                        <label for="backend-endpoint">
+                            Backend API Endpoint Name:
+                            <button type="button" id="show-endpoint-help" class="help-link-button">What is this?</button>
+                        </label>
+                        <input type="text" id="backend-endpoint" name="backend-endpoint" value="/api/generate">
+                        <small>e.g., /api/generate, /api/chat, /my-custom-endpoint</small>
+                        <div id="endpoint-help-text" class="help-text-content" style="display:none;">
+                            <p>
+                                <strong>What is the Backend API Endpoint?</strong><br>
+                                This is the specific path on your backend server where your Qualtrics survey will send requests to interact with the AI. Think of it as a unique "address" for this particular AI function.
+                                <br><br>
+                                <strong>How to choose a value:</strong>
+                                <ul>
+                                    <li><strong>Start with a slash:</strong> It MUST begin with a forward slash <code>/</code>.</li>
+                                    <li><strong>Naming:</strong> You can name it almost anything you like! Common conventions include:
+                                        <ul>
+                                            <li><code>/api/generate</code> (for text generation)</li>
+                                            <li><code>/api/chat</code> (for conversational AI)</li>
+                                            <li><code>/my-ai-service</code></li>
+                                            <li><code>/custom-model-endpoint</code></li>
+                                        </ul>
+                                    </li>
+                                    <li><strong>Simplicity:</strong> Keep it relatively simple, descriptive, and easy to remember. Avoid spaces or special characters other than hyphens (<code>-</code>) or underscores (<code>_</code>).</li>
+                                    <li><strong>Consistency is Key:</strong> The name you choose here <em>must exactly match</em> the route defined in your Python backend code and the URL path used in your Qualtrics JavaScript. The default <code>/api/generate</code> is a safe choice if you're unsure.</li>
+                                </ul>
+                                <strong>Example:</strong>
+                                <ul>
+                                    <li>If your full backend server is at <code>https://my-research-backend.com</code> and you set this endpoint name to <code>/api/analyze-text</code>, then your Qualtrics JavaScript will need to send requests to <code>https://my-research-backend.com/api/analyze-text</code>.</li>
+                                </ul>
+                                <button type="button" id="hide-endpoint-help" class="help-hide-button">Got it, hide help</button>
+                            </p>
+                        </div>
+                    </div>
+
+                    <hr>
+                    <h3>CORS Configuration (Backend)</h3>
+                    <div>
+                        <label for="cors-domains">Allowed Frontend Domains (for CORS):
+                            <button type="button" id="show-cors-help" class="help-link-button">How to find this?</button>
+                        </label>
+                        <input type="text" id="cors-domains" name="cors-domains" placeholder="e.g., https://your-uni.qualtrics.com" required>
+                        <small class="help-block">
+                            <strong>This field is required.</strong> Enter your Qualtrics domain(s), comma-separated.
+                        </small>
+                        <div id="cors-help-text" class="help-text-content" style="display:none;">
+                            <p><strong>To find your Qualtrics domain(s):</strong></p>
+                            <ol>
+                                <li>Log in to your Qualtrics account.</li>
+                                <li>Open any of your surveys (or create a new one and preview it).</li>
+                                <li>Go to the "Distributions" tab and get the "Anonymous Link", OR simply "Preview" the survey.</li>
+                                <li>Look at the URL in your browser's address bar. It will look something like:
+                                    <br><code>https://<strong>yourorganization.qualtrics.com</strong>/jfe/form/SV_...</code>
+                                    <br>or for specific datacenters:
+                                    <br><code>https://<strong>yourbrand.eu.qualtrics.com</strong>/jfe/form/SV_...</code>
+                                </li>
+                                <li>The part you need for CORS is the "origin": the <code>https://</code> plus the full hostname (e.g., <code>https://yourorganization.qualtrics.com</code>).</li>
+                                <li>Copy this exact origin and paste it into the field above.</li>
+                                <li>If your institution uses multiple Qualtrics domains, enter them separated by commas.</li>
+                            </ol>
+                            <button type="button" id="hide-cors-help" class="help-hide-button">Got it, hide help</button>
+                        </div>
+                    </div>
+
+                    <hr>
+                    <button type="button" id="generate-btn">Generate Code Snippets</button>
+                </form>
+            </section>
+
+            <section id="output-panel">
+                <h2>Generated Snippets</h2>
+                <div class="output-group">
+                    <h3>Python Backend (Flask - `app.py`)</h3>
+                    <pre><code id="python-output"># Python code will appear here...</code></pre>
+                    <button class="copy-btn" data-target="python-output">Copy Python</button>
+                </div>
+
+                <div class="output-group">
+                    <h3>Qualtrics JavaScript (`qualtrics.js`)</h3>
+                    <pre><code id="javascript-output"># JavaScript for Qualtrics will appear here...</code></pre>
+                    <button class="copy-btn" data-target="javascript-output">Copy JavaScript</button>
+                </div>
+
+                <div class="output-group">
+                    <h3>Environment Variables (`.env`)</h3>
+                    <pre><code id="env-output"># .env content will appear here...</code></pre>
+                    <button class="copy-btn" data-target="env-output">Copy .env</button>
+                </div>
+
+                <div class="output-group">
+                    <h3>Requirements (`requirements.txt`)</h3>
+                    <pre><code id="requirements-output"># requirements.txt content will appear here...</code></pre>
+                    <button class="copy-btn" data-target="requirements-output">Copy Requirements</button>
+                </div>
+            </section>
+        </div> <!-- End of configurator-content div -->
+
+        <!-- Instructions Panel - Sibling to configurator-content -->
+        <section id="instructions-panel" style="display:none;">
+            <h2>How to Use Your Generated GenAI App Code</h2>
+            <p>
+                This guide walks you through setting up your AI application from start to finish. 
+                The steps are designed to be approachable for researchers without extensive programming experience.
+            </p>
+
+            <ol>
+                <li>
+                    <strong>Set Up Your Python Environment</strong>
+                    <ul>
+                        <li>If you don't have Python installed:
+                            <ul>
+                                <li>Download and install Python 3.9 or newer from <a href="https://www.python.org/downloads/" target="_blank">python.org</a></li>
+                                <li>During installation, check the box to "Add Python to PATH"</li>
+                            </ul>
+                        </li>
+                        <li>We recommend using an IDE (Integrated Development Environment) for easier development:
+                            <ul>
+                                <li><strong>AI-Augmented IDEs (Highly Recommended):</strong>
+                                    <ul>
+                                        <li><a href="https://cursor.sh/" target="_blank">Cursor</a> - Free editor built on VS Code with integrated AI assistance. Excellent for understanding and modifying code.</li>
+                                        <li><a href="https://www.windsurf.io/" target="_blank">Windsurf</a> - An AI-powered development environment that can help explain and enhance code.</li>
+                                        <li>These AI-augmented tools are especially helpful if you're not familiar with Python, as they can explain code concepts and help debug issues.</li>
+                                    </ul>
+                                </li>
+                                <li><strong>Traditional IDEs:</strong>
+                                    <ul>
+                                        <li><a href="https://code.visualstudio.com/" target="_blank">Visual Studio Code</a> - Free, powerful editor with excellent Python support</li>
+                                        <li><a href="https://www.jetbrains.com/pycharm/download/" target="_blank">PyCharm Community Edition</a> - Free IDE specifically for Python</li>
+                                        <li>Simpler alternatives: <a href="https://www.sublimetext.com/" target="_blank">Sublime Text</a> or <a href="https://notepad-plus-plus.org/" target="_blank">Notepad++</a></li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    <strong>Create Your Project Files</strong>
+                    <ul>
+                        <li>Create a new folder for your project (e.g., <code>my_ai_backend</code>)</li>
+                        <li>Create these files in your folder using your IDE or text editor:
+                            <ul>
+                                <li><code>app.py</code> - Copy the Python Backend code from the "Configurator" tab</li>
+                                <li><code>.env</code> - Copy the Environment Variables code</li>
+                                <li><code>requirements.txt</code> - Copy the Requirements code</li>
+                            </ul>
+                        </li>
+                        <li>Create a <code>.gitignore</code> file with these contents if you plan to use Git (optional):
+                        <pre>
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+ENV/
+
+# Environment variables (contains secrets!)
+.env
+
+# IDE folders
+.idea/
+.vscode/
+                        </pre>
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    <strong>Set Up Your Python Virtual Environment and Install Dependencies</strong>
+                    <ul>
+                        <li>Open a command prompt/terminal in your project folder</li>
+                        <li>Create a virtual environment (this isolates your project's dependencies):
+                            <pre># Windows
+python -m venv venv
+
+# macOS/Linux
+python3 -m venv venv</pre>
+                        </li>
+                        <li>Activate the virtual environment:
+                            <pre># Windows (Command Prompt)
+venv\Scripts\activate.bat
+
+# Windows (PowerShell)
+venv\Scripts\Activate.ps1
+
+# macOS/Linux
+source venv/bin/activate</pre>
+                        </li>
+                        <li>Install the required packages:
+                            <pre>pip install -r requirements.txt</pre>
+                        </li>
+                        <li>You should see confirmation messages as packages are installed</li>
+                    </ul>
+                </li>
+                <li>
+                    <strong>Set Up Your AI API Keys</strong>
+                    <ul>
+                        <li>Edit the <code>.env</code> file to add your actual API key:
+                            <ul>
+                                <li>For Google Gemini: Replace <code>YOUR_GEMINI_API_KEY_HERE</code> with your actual key (get one at <a href="https://aistudio.google.com/app/apikey" target="_blank">Google AI Studio</a>)</li>
+                                <li>For OpenAI: Replace <code>YOUR_OPENAI_API_KEY_HERE</code> with your actual key (get one at <a href="https://platform.openai.com/account/api-keys" target="_blank">OpenAI Platform</a>)</li>
+                            </ul>
+                        </li>
+                        <li><strong>Important:</strong> Never share your API keys or commit them to public repositories</li>
+                    </ul>
+                </li>
+                <li>
+                    <strong>Test Your Backend Locally</strong>
+                    <ul>
+                        <li>In your terminal (with virtual environment activated), run:
+                            <pre>python app.py</pre>
+                        </li>
+                        <li>You should see output indicating the server is running, typically on <code>http://0.0.0.0:5001</code></li>
+                        <li>Keep this terminal window open while testing</li>
+                    </ul>
+                </li>
+                <li>
+                    <strong>Deploy Your Backend (For Research Use)</strong>
+                    <p>For your Qualtrics survey to access the AI, you need your backend accessible from the internet. Options include:</p>
+                    
+                    <details>
+                        <summary><strong>Option 1: Free cloud hosting (Recommended for beginners)</strong></summary>
+                        <ul>
+                            <li><a href="https://render.com/" target="_blank">Render</a>: Easy free tier with simple deployment
+                                <ol>
+                                    <li>Sign up for a free account</li>
+                                    <li>Create a new "Web Service"</li>
+                                    <li>Connect to your GitHub repository or upload your files</li>
+                                    <li>Set build command: <code>pip install -r requirements.txt</code></li>
+                                    <li>Set start command: <code>gunicorn app:app</code></li>
+                                    <li>Under "Advanced" settings, add your environment variables (<code>GEMINI_API_KEY</code> or <code>OPENAI_API_KEY</code>)</li>
+                                </ol>
+                            </li>
+                            <li><a href="https://railway.app/" target="_blank">Railway</a>: Another user-friendly option with a free tier</li>
+                            <li><a href="https://www.pythonanywhere.com/" target="_blank">PythonAnywhere</a>: Python-specific hosting with a free tier</li>
+                        </ul>
+                    </details>
+                    
+                    <details>
+                        <summary><strong>Option 2: Advanced hosting</strong></summary>
+                        <ul>
+                            <li><a href="https://cloud.google.com/run" target="_blank">Google Cloud Run</a></li>
+                            <li><a href="https://aws.amazon.com/lambda/" target="_blank">AWS Lambda</a> with API Gateway</li>
+                            <li><a href="https://azure.microsoft.com/en-us/services/app-service/" target="_blank">Azure App Service</a></li>
+                            <li>Your institution's server (consult with your IT department)</li>
+                        </ul>
+                    </details>
+                    
+                    <details>
+                        <summary><strong>Option 3: Temporary public access for local development</strong></summary>
+                        <p>Tools like <a href="https://ngrok.com/" target="_blank">ngrok</a> can expose your local server to the internet temporarily:</p>
+                        <ol>
+                            <li>Download and install ngrok</li>
+                            <li>Run your Flask app locally: <code>python app.py</code></li>
+                            <li>In a separate terminal: <code>ngrok http 5001</code></li>
+                            <li>Use the provided https URL (e.g., <code>https://a1b2c3d4.ngrok.io</code>) as your backend URL</li>
+                            <li><strong>Note:</strong> The URL changes each time you restart ngrok unless you have a paid account</li>
+                        </ol>
+                    </details>
+                    
+                    <p><strong>Important:</strong> Make sure your CORS configuration includes your actual Qualtrics domain!</p>
+                </li>
+                <li>
+                    <strong>Set Up Your Qualtrics Survey</strong>
+                    <ul>
+                        <li>Log in to your Qualtrics account and create a new survey or open an existing one</li>
+                        <li>Add a new question where you want the AI interaction to occur (a Text/Graphic type works well)</li>
+                        <li>Click on the question to select it, then:
+                            <ol>
+                                <li>Click the gear icon (⚙️) to access question settings</li>
+                                <li>Go to "JavaScript" (you may need to click "Advanced" first in some interfaces)</li>
+                                <li>Paste the <code>qualtrics.js</code> code from the configurator into the JavaScript editor</li>
+                                <li>Important: Replace <code>YOUR_BACKEND_URL_HERE</code> with your actual deployed backend URL (e.g., <code>https://your-app.onrender.com</code> or <code>https://a1b2c3d4.ngrok.io</code>)</li>
+                            </ol>
+                        </li>
+                        <li>Optional: Add additional settings to store the AI responses as embedded data:
+                            <ol>
+                                <li>Uncomment the lines with <code>Qualtrics.SurveyEngine.setEmbeddedData</code></li>
+                                <li>Add those embedded data fields to your survey by going to Survey Flow → Add a New Element → Embedded Data</li>
+                            </ol>
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    <strong>Test Everything Together</strong>
+                    <ul>
+                        <li>Preview your Qualtrics survey</li>
+                        <li>Enter a test prompt in the AI interface and click "Generate Response"</li>
+                        <li>If it works: Great! Your setup is complete</li>
+                        <li>If it doesn't work:
+                            <ul>
+                                <li>Check your browser's developer console (F12 → Console tab) for error messages</li>
+                                <li>Verify your backend is running (check the logs)</li>
+                                <li>Confirm that your CORS settings include your Qualtrics domain</li>
+                                <li>Check that you replaced <code>YOUR_BACKEND_URL_HERE</code> with your actual backend URL in the Qualtrics JavaScript</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    <strong>Need Help?</strong>
+                    <ul>
+                        <li>The generated code includes comments explaining key parts of the functionality</li>
+                        <li>If you encounter issues with API limits or quotas, check your API provider's documentation</li>
+                        <li>For deployment help, most platforms offer detailed documentation and tutorials</li>
+                        <li>Visit our <a href="https://github.com/GenAI-interaction-research" target="_blank">GitHub organization</a> for example applications, discussions, and additional resources</li>
+                        <li>You can find more examples like a <a href="https://github.com/GenAI-interaction-research/podcast_recommender" target="_blank">podcast recommender</a> and an <a href="https://github.com/GenAI-interaction-research/qualtrics_image_gen_edit" target="_blank">image generation tool</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <strong>CORS Configuration (Critical for Deployment)</strong>
+                    <ul>
+                        <li>CORS (Cross-Origin Resource Sharing) controls which domains can access your API.</li>
+                        <li>You <strong>must</strong> correctly set this to your Qualtrics domain (e.g., <code>https://youruniversity.qualtrics.com</code>).</li>
+                        <li>If your API is deployed but Qualtrics shows errors like "blocked by CORS policy", check that:
+                            <ul>
+                                <li>Your CORS domain exactly matches your Qualtrics domain (including https:// and any subdomains)</li>
+                                <li>Your backend is properly configured with the CORS headers</li>
+                                <li>Your backend is publicly accessible from the internet</li>
+                            </ul>
+                        </li>
+                        <li>For testing environments, you may need to add multiple domains (separate them with commas in the configurator).</li>
+                    </ul>
+                </li>
+                <li>
+                    <strong>Using Qualtrics Embedded Data</strong>
+                    <ul>
+                        <li>The JavaScript code automatically saves conversation history and responses to Qualtrics embedded data fields.</li>
+                        <li>To access this data in your survey:
+                            <ol>
+                                <li>Go to the Survey Flow editor in Qualtrics</li>
+                                <li>Add an "Embedded Data" element</li>
+                                <li>Add these field names:
+                                    <ul>
+                                        <li><code>genAI_fullHistory</code> - Contains the full conversation history as JSON</li>
+                                        <li><code>genAI_lastResponse</code> - Contains only the most recent AI response</li>
+                                    </ul>
+                                </li>
+                                <li>You can use these values in subsequent questions or for data analysis</li>
+                            </ol>
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    <strong>Accessing AI Responses in Qualtrics</strong>
+                    <ul>
+                        <li>The generated code automatically saves AI interactions to Qualtrics <strong>Embedded Data Fields</strong></li>
+                        <li><strong>Important:</strong> For this to work, you must add these fields to your Survey Flow:</li>
+                        <li>Steps to set up:
+                            <ol>
+                                <li>In Qualtrics, go to Survey → Survey Flow</li>
+                                <li>Click "Add a New Element Here" → Select "Embedded Data"</li>
+                                <li>Add these two field names:</li>
+                                <ul>
+                                    <li><code>genAI_fullHistory</code> - Contains the complete conversation</li>
+                                    <li><code>genAI_lastResponse</code> - Contains only the latest AI response</li>
+                                </ul>
+                                <li>Move this Embedded Data element <strong>before</strong> your AI question in the flow</li>
+                                <li>Click "Save Flow"</li>
+                            </ol>
+                        </li>
+                    </ul>
+                </li>
+            </ol>
+        </section>
+    </main>
+
+    <footer>
+        <p>Generated by GenAI Interaction Research Toolkit Configurator</p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
